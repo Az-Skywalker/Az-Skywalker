@@ -88,6 +88,36 @@ source sky/bin/activate
 
 ## Usage
 
+## Running and Using `Skywalker-CLI.py`
+
+`Skywalker-CLI.py` is a unified command-line interface that allows users to interactively select and execute security reconnaissance scenarios.
+
+### Running in Interactive Mode
+
+Run the CLI script without arguments to enter the interactive menu:
+```bash
+python Skywalker-CLI.py
+```
+The script will prompt you to select a scenario (`logicapps` or `keyvaults`) and configure various options interactively.
+
+### Running with Command-Line Arguments
+You can also execute specific reconnaissance scenarios directly:
+```bash
+python Skywalker-CLI.py keyvaults -json -csv
+```
+```bash
+python Skywalker-CLI.py logicapps -loglevel info
+```
+
+#### Available Scenarios
+- **keyvaults**: Executes `Skywalker-KeyVault.py` to retrieve secrets from Azure Key Vaults.
+- **logicapps**: Executes `Skywalker-LogicApps.py` to analyze secrets usage in Logic Apps.
+
+#### Common Arguments
+- `-json`: Output results to a JSON file.
+- `-csv`: Output results to a CSV file.
+- `-loglevel [quiet|info|verbose]`: Set the log level.
+
 ### Skywalker-KeyVault.py Script
 
 1. **Prerequisites**:
