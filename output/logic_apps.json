@@ -1,0 +1,66 @@
+[
+    {
+        "SubscriptionId": "35563d84-e3af-43c1-a0d3-e7aa84ebf1aa",
+        "ResourceGroupName": "galactic-empire-rg1",
+        "LogicAppName": "logi-1",
+        "KeyVaultInfo": [
+            {
+                "KeyVaultName": "keyvault",
+                "KeyVaultId": "/subscriptions/35563d84-e3af-43c1-a0d3-e7aa84ebf1aa/providers/Microsoft.Web/locations/uksouth/managedApis/keyvault"
+            }
+        ],
+        "KeyVaultSecretActions": [
+            {
+                "ActionName": "Get_secret_version",
+                "SecretName": "risk-register-admin-password"
+            }
+        ],
+        "InputsLink": "https://prod-21.uksouth.logic.azure.com:443/workflows/2c85458e0b2147f3a3ef6bcae0ff7997/runs/08584660273854748250447950450CU09/actions/Get_secret_version/contents/ActionInputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273854748250447950450CU09%2Factions%2FGet_secret_version%2Fcontents%2FActionInputs%2Fread&sv=1.0&sig=84Y8XJ2-2ygulXQ_BHU8XgN-tmClQlRhyshdhFG1FPQ",
+        "OutputsLink": "https://prod-21.uksouth.logic.azure.com:443/workflows/2c85458e0b2147f3a3ef6bcae0ff7997/runs/08584660273854748250447950450CU09/actions/Get_secret_version/contents/ActionOutputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273854748250447950450CU09%2Factions%2FGet_secret_version%2Fcontents%2FActionOutputs%2Fread&sv=1.0&sig=2ydUFPj0NTurXoPjwIMzvkTDT-u6FPpFTtdOeyQZa0Y",
+        "InputBody": null,
+        "OutputBody": {
+            "value": "password123",
+            "name": "risk-register-admin-password",
+            "version": "70ab34121c64481480d806cc048d7f99",
+            "contentType": null,
+            "isEnabled": true,
+            "createdTime": "2024-12-21T13:33:58Z",
+            "lastUpdatedTime": "2024-12-21T13:33:58Z",
+            "validityStartTime": null,
+            "validityEndTime": null
+        },
+        "EndTime": "2024-12-30T17:25:00.4293787Z"
+    },
+    {
+        "SubscriptionId": "35563d84-e3af-43c1-a0d3-e7aa84ebf1aa",
+        "ResourceGroupName": "galactic-empire-rg1",
+        "LogicAppName": "logi-2",
+        "KeyVaultInfo": [
+            {
+                "KeyVaultName": "keyvault",
+                "KeyVaultId": "/subscriptions/35563d84-e3af-43c1-a0d3-e7aa84ebf1aa/providers/Microsoft.Web/locations/uksouth/managedApis/keyvault"
+            }
+        ],
+        "KeyVaultSecretActions": [
+            {
+                "ActionName": "Get_secret_version",
+                "SecretName": "risk-register-admin-password"
+            }
+        ],
+        "InputsLink": "https://prod-23.uksouth.logic.azure.com:443/workflows/db10d2ccd0a7470f85cf326bc92cdc8d/runs/08584660273853241947273607938CU08/actions/Get_secret_version/contents/ActionInputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273853241947273607938CU08%2Factions%2FGet_secret_version%2Fcontents%2FActionInputs%2Fread&sv=1.0&sig=LoFa6qsXZmJK95-eUYvYw5RlyW0-LOJmmCLVUIlWSdU",
+        "OutputsLink": "https://prod-23.uksouth.logic.azure.com:443/workflows/db10d2ccd0a7470f85cf326bc92cdc8d/runs/08584660273853241947273607938CU08/actions/Get_secret_version/contents/ActionOutputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273853241947273607938CU08%2Factions%2FGet_secret_version%2Fcontents%2FActionOutputs%2Fread&sv=1.0&sig=XQSR1rqhUWA7D-1uQ0xxUpwMQbxO7zfCKtv0oJK5WY0",
+        "InputBody": null,
+        "OutputBody": {
+            "value": "password123",
+            "name": "risk-register-admin-password",
+            "version": "70ab34121c64481480d806cc048d7f99",
+            "contentType": null,
+            "isEnabled": true,
+            "createdTime": "2024-12-21T13:33:58Z",
+            "lastUpdatedTime": "2024-12-21T13:33:58Z",
+            "validityStartTime": null,
+            "validityEndTime": null
+        },
+        "EndTime": "2024-12-30T17:25:00.4476723Z"
+    }
+]
