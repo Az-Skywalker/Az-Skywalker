@@ -9,6 +9,22 @@
 
 # Az-SkyWalker
 
+> ## 🚨 Security Advisory — 30 March 2026
+>
+> **Microsoft has silently remediated SilentReaper.**
+>
+> As of March 2026, Microsoft have quietly patched the vulnerability underlying the *SilentReaper* technique.
+> The Azure Logic Apps Management API **no longer emits SAS URIs** in the `inputsLink` and `outputsLink`
+> fields of action run details — these fields now return `null` in the API response.
+>
+> Additionally, Microsoft have retroactively removed all SAS URI examples from the official
+> [`azure-rest-api-specs`](https://github.com/Azure/azure-rest-api-specs) repository, quietly eliminating
+> the documented evidence that this data was ever accessible through the API.
+>
+> The sample output in this README has been updated to reflect the current API behaviour.
+> `InputsLink` and `OutputsLink` will now always be `null`. The `-dump_secrets` flag in
+> `Skywalker-LogicApps.py` will no longer yield secret values via this technique.
+
 Az-SkyWalker is a project designed to enumerate all secrets in all Azure Key Vaults and Logic Apps across all subscriptions. 
 The project includes scripts written in Python, allowing users to execute their tasks seamlessly. The scripts utilize the Azure Management API to retrieve and display secret details, with options to output results to JSON and CSV files.
 
@@ -46,22 +62,23 @@ This project is licensed under the MIT License. See the LICENSE file for more
 Az-SkyWalker/
 ├── docker
 │   ├── az-skywalker.dockerfile
-├── outputs/
+├── output/
 │   ├── secrets.csv
 │   ├── secrets.json
 │   ├── logic_apps.csv
 │   └── logic_apps.json
 ├── src/
 │   └── Python/
-│       ├── Skywalker-KeyVault.py
+│       ├── Skywalker-CLI.py
+│       ├── Skywalker-KeyVaults.py
 │       ├── Skywalker-LogicApps.py
 │       └── requirements.txt
 └── README.md
 ```
 
 - `docker/`: Contains `az-skywalker.dockerfile` for building a ubuntu container image with everything you need to run Az-SkyWalker
-- `outputs/`: Contains sample output files (`secrets.csv`, `secrets.json`, `logic_apps.csv`, and `logic_apps.json`) demonstrating the results of running the scripts.
-- `src/Python/`: Contains the Python scripts `Skywalker-KeyVault.py` and `Skywalker-LogicApps.py`, along with the corresponding `requirements.txt` file.
+- `output/`: Contains sample output files (`secrets.csv`, `secrets.json`, `logic_apps.csv`, and `logic_apps.json`) demonstrating the results of running the scripts.
+- `src/Python/`: Contains the Python scripts `Skywalker-CLI.py`, `Skywalker-KeyVaults.py` and `Skywalker-LogicApps.py`, along with the corresponding `requirements.txt` file.
 - `README.md`: Project documentation.
 
 ## Running Az-SkyWalker Manually on Ubuntu
@@ -133,7 +150,7 @@ python Skywalker-CLI.py logicapps -loglevel info
 ```
 
 #### Available Scenarios
-- **keyvaults**: Executes `Skywalker-KeyVault.py` to retrieve secrets from Azure Key Vaults.
+- **keyvaults**: Executes `Skywalker-KeyVaults.py` to retrieve secrets from Azure Key Vaults.
 - **logicapps**: Executes `Skywalker-LogicApps.py` to analyze secrets usage in Logic Apps.
 
 #### Common Arguments
@@ -141,7 +158,7 @@ python Skywalker-CLI.py logicapps -loglevel info
 - `-csv`: Output results to a CSV file.
 - `-loglevel [quiet|info|verbose]`: Set the log level.
 
-### Skywalker-KeyVault.py Script
+### Skywalker-KeyVaults.py Script
 
 1. **Prerequisites**:
    - Ensure Python is installed.
@@ -160,7 +177,7 @@ python Skywalker-CLI.py logicapps -loglevel info
    cd src/Python
 
    # Run the script
-   python Skywalker-KeyVault.py -json -csv -noDisplay
+   python Skywalker-KeyVaults.py -json -csv -noDisplay
    ```
 
    - `-json`: Output results to a JSON file.
@@ -186,12 +203,14 @@ python Skywalker-CLI.py logicapps -loglevel info
    cd src/Python
 
    # Run the script
-   python Skywalker-LogicApps.py -json -csv -noDisplay
+   python Skywalker-LogicApps.py -json -csv -loglevel info
    ```
 
    - `-json`: Output results to a JSON file.
    - `-csv`: Output results to a CSV file.
-   - `-noDisplay`: Do not display the secrets and workflow configurations on screen but still respect the `-json` and `-csv` options.
+   - `-loglevel [quiet|info|verbose]`: Set the log level (default: `info`).
+   - `-dump_secrets`: Retrieve and output the body of `inputsLink` and `outputsLink` URLs. ⚠️ See advisory above — SAS URIs are no longer emitted by the API.
+   - `-all_history`: Process all runs of the workflow, not just the most recent.
 
 ## Sample Output
 
@@ -225,6 +244,9 @@ SubscriptionId,ResourceGroupName,KeyVaultName,SecretName,ContentType,Enabled,Not
 
 ### JSON Output (Skywalker-LogicApps.py)
 
+> ⚠️ **As of 30 March 2026, `InputsLink` and `OutputsLink` are `null` in the API response.**
+> Microsoft have silently remediated SilentReaper — see the advisory at the top of this page.
+
 ```json
 [
     {
@@ -243,20 +265,10 @@ SubscriptionId,ResourceGroupName,KeyVaultName,SecretName,ContentType,Enabled,Not
                 "SecretName": "risk-register-admin-password"
             }
         ],
-        "InputsLink": "https://prod-21.uksouth.logic.azure.com:443/workflows/2c85458e0b2147f3a3ef6bcae0ff7997/runs/08584660273854748250447950450CU09/actions/Get_secret_version/contents/ActionInputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273854748250447950450CU09%2Factions%2FGet_secret_version%2Fcontents%2FActionInputs%2Fread&sv=1.0&sig=84Y8XJ2-2ygulXQ_BHU8XgN-tmClQlRhyshdhFG1FPQ",
-        "OutputsLink": "https://prod-21.uksouth.logic.azure.com:443/workflows/2c85458e0b2147f3a3ef6bcae0ff7997/runs/08584660273854748250447950450CU09/actions/Get_secret_version/contents/ActionOutputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273854748250447950450CU09%2Factions%2FGet_secret_version%2Fcontents%2FActionOutputs%2Fread&sv=1.0&sig=2ydUFPj0NTurXoPjwIMzvkTDT-u6FPpFTtdOeyQZa0Y",
+        "InputsLink": null,
+        "OutputsLink": null,
         "InputBody": null,
-        "OutputBody": {
-            "value": "password123",
-            "name": "risk-register-admin-password",
-            "version": "70ab34121c64481480d806cc048d7f99",
-            "contentType": null,
-            "isEnabled": true,
-            "createdTime": "2024-12-21T13:33:58Z",
-            "lastUpdatedTime": "2024-12-21T13:33:58Z",
-            "validityStartTime": null,
-            "validityEndTime": null
-        },
+        "OutputBody": null,
         "EndTime": "2024-12-30T17:25:00.4293787Z"
     },
     {
@@ -275,20 +287,10 @@ SubscriptionId,ResourceGroupName,KeyVaultName,SecretName,ContentType,Enabled,Not
                 "SecretName": "risk-register-admin-password"
             }
         ],
-        "InputsLink": "https://prod-23.uksouth.logic.azure.com:443/workflows/db10d2ccd0a7470f85cf326bc92cdc8d/runs/08584660273853241947273607938CU08/actions/Get_secret_version/contents/ActionInputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273853241947273607938CU08%2Factions%2FGet_secret_version%2Fcontents%2FActionInputs%2Fread&sv=1.0&sig=LoFa6qsXZmJK95-eUYvYw5RlyW0-LOJmmCLVUIlWSdU",
-        "OutputsLink": "https://prod-23.uksouth.logic.azure.com:443/workflows/db10d2ccd0a7470f85cf326bc92cdc8d/runs/08584660273853241947273607938CU08/actions/Get_secret_version/contents/ActionOutputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273853241947273607938CU08%2Factions%2FGet_secret_version%2Fcontents%2FActionOutputs%2Fread&sv=1.0&sig=XQSR1rqhUWA7D-1uQ0xxUpwMQbxO7zfCKtv0oJK5WY0",
+        "InputsLink": null,
+        "OutputsLink": null,
         "InputBody": null,
-        "OutputBody": {
-            "value": "password123",
-            "name": "risk-register-admin-password",
-            "version": "70ab34121c64481480d806cc048d7f99",
-            "contentType": null,
-            "isEnabled": true,
-            "createdTime": "2024-12-21T13:33:58Z",
-            "lastUpdatedTime": "2024-12-21T13:33:58Z",
-            "validityStartTime": null,
-            "validityEndTime": null
-        },
+        "OutputBody": null,
         "EndTime": "2024-12-30T17:25:00.4476723Z"
     }
 ]
@@ -298,8 +300,8 @@ SubscriptionId,ResourceGroupName,KeyVaultName,SecretName,ContentType,Enabled,Not
 
 ```csv
 SubscriptionId,ResourceGroupName,LogicAppName,KeyVaultInfo,KeyVaultSecretActions,InputsLink,OutputsLink,InputBody,OutputBody,EndTime
-35563d84-e3af-43c1-a0d3-e7aa84ebf1aa,galactic-empire-rg1,logi-1,"[{'KeyVaultName': 'keyvault', 'KeyVaultId': '/subscriptions/35563d84-e3af-43c1-a0d3-e7aa84ebf1aa/providers/Microsoft.Web/locations/uksouth/managedApis/keyvault'}]","[{'ActionName': 'Get_secret_version', 'SecretName': 'risk-register-admin-password'}]",https://prod-21.uksouth.logic.azure.com:443/workflows/2c85458e0b2147f3a3ef6bcae0ff7997/runs/08584660273854748250447950450CU09/actions/Get_secret_version/contents/ActionInputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273854748250447950450CU09%2Factions%2FGet_secret_version%2Fcontents%2FActionInputs%2Fread&sv=1.0&sig=84Y8XJ2-2ygulXQ_BHU8XgN-tmClQlRhyshdhFG1FPQ,https://prod-21.uksouth.logic.azure.com:443/workflows/2c85458e0b2147f3a3ef6bcae0ff7997/runs/08584660273854748250447950450CU09/actions/Get_secret_version/contents/ActionOutputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273854748250447950450CU09%2Factions%2FGet_secret_version%2Fcontents%2FActionOutputs%2Fread&sv=1.0&sig=2ydUFPj0NTurXoPjwIMzvkTDT-u6FPpFTtdOeyQZa0Y,,"{'value': 'password123', 'name': 'risk-register-admin-password', 'version': '70ab34121c64481480d806cc048d7f99', 'contentType': None, 'isEnabled': True, 'createdTime': '2024-12-21T13:33:58Z', 'lastUpdatedTime': '2024-12-21T13:33:58Z', 'validityStartTime': None, 'validityEndTime': None}",2024-12-30T17:25:00.4293787Z
-35563d84-e3af-43c1-a0d3-e7aa84ebf1aa,galactic-empire-rg1,logi-2,"[{'KeyVaultName': 'keyvault', 'KeyVaultId': '/subscriptions/35563d84-e3af-43c1-a0d3-e7aa84ebf1aa/providers/Microsoft.Web/locations/uksouth/managedApis/keyvault'}]","[{'ActionName': 'Get_secret_version', 'SecretName': 'risk-register-admin-password'}]",https://prod-23.uksouth.logic.azure.com:443/workflows/db10d2ccd0a7470f85cf326bc92cdc8d/runs/08584660273853241947273607938CU08/actions/Get_secret_version/contents/ActionInputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273853241947273607938CU08%2Factions%2FGet_secret_version%2Fcontents%2FActionInputs%2Fread&sv=1.0&sig=LoFa6qsXZmJK95-eUYvYw5RlyW0-LOJmmCLVUIlWSdU,https://prod-23.uksouth.logic.azure.com:443/workflows/db10d2ccd0a7470f85cf326bc92cdc8d/runs/08584660273853241947273607938CU08/actions/Get_secret_version/contents/ActionOutputs?api-version=2016-06-01&se=2024-12-30T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08584660273853241947273607938CU08%2Factions%2FGet_secret_version%2Fcontents%2FActionOutputs%2Fread&sv=1.0&sig=XQSR1rqhUWA7D-1uQ0xxUpwMQbxO7zfCKtv0oJK5WY0,,"{'value': 'password123', 'name': 'risk-register-admin-password', 'version': '70ab34121c64481480d806cc048d7f99', 'contentType': None, 'isEnabled': True, 'createdTime': '2024-12-21T13:33:58Z', 'lastUpdatedTime': '2024-12-21T13:33:58Z', 'validityStartTime': None, 'validityEndTime': None}",2024-12-30T17:25:00.4476723Z
+35563d84-e3af-43c1-a0d3-e7aa84ebf1aa,galactic-empire-rg1,logi-1,"[{'KeyVaultName': 'keyvault', 'KeyVaultId': '/subscriptions/35563d84-e3af-43c1-a0d3-e7aa84ebf1aa/providers/Microsoft.Web/locations/uksouth/managedApis/keyvault'}]","[{'ActionName': 'Get_secret_version', 'SecretName': 'risk-register-admin-password'}]",,,,,2024-12-30T17:25:00.4293787Z
+35563d84-e3af-43c1-a0d3-e7aa84ebf1aa,galactic-empire-rg1,logi-2,"[{'KeyVaultName': 'keyvault', 'KeyVaultId': '/subscriptions/35563d84-e3af-43c1-a0d3-e7aa84ebf1aa/providers/Microsoft.Web/locations/uksouth/managedApis/keyvault'}]","[{'ActionName': 'Get_secret_version', 'SecretName': 'risk-register-admin-password'}]",,,,,2024-12-30T17:25:00.4476723Z
 ```
 
 ## Contributing

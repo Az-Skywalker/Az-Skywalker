@@ -1,14 +1,19 @@
 import argparse
 import subprocess
 import re
+import sys  # For clean Ctrl + C handling
+from pathlib import Path
+
 import questionary
 import readchar  # Instant keypress detection
-import sys  # For clean Ctrl + C handling
+
+# Resolve script paths relative to this file so the CLI works regardless of cwd
+_SCRIPT_DIR = Path(__file__).parent
 
 # Mapping of available scenarios to their respective script files
 SCENARIOS = {
-    "logicapps": "Skywalker-LogicApps.py",
-    "keyvaults": "Skywalker-KeyVaults.py",
+    "logicapps": str(_SCRIPT_DIR / "Skywalker-LogicApps.py"),
+    "keyvaults": str(_SCRIPT_DIR / "Skywalker-KeyVaults.py"),
 }
 
 def extract_arguments_from_script(script_path):
@@ -88,6 +93,7 @@ def get_yes_no_input(prompt):
         sys.exit(0)
 
 def interactive_menu():
+    """Interactive CLI menu for selecting a scenario and its arguments."""
     banner = r"""
      _             ____  _                        _ _             
     / \    ____   / ___|| | ___   ___      ____ _| | | _____ _ __ 
@@ -96,7 +102,6 @@ def interactive_menu():
  /_/   \_\/___|   |____/|_|\_\\__, | \_/\_/ \__,_|_|_|\_\___|_|   
                               |___/
     """
-    """Interactive CLI menu for selecting a scenario and its arguments."""
     print(banner)
     print("\n=== Skywalker Recon CLI ===")
 
@@ -162,7 +167,7 @@ def run_scenario(scenario, user_args):
         print(f"[ERROR] Invalid scenario '{scenario}'. Use --help to see available options.")
         return
 
-    cmd = ["python3", script_path] + user_args
+    cmd = [sys.executable, script_path] + user_args
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
