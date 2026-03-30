@@ -93,8 +93,14 @@ def extract_secret_actions(logic_app_definition):
         
         if connection.get("name") == "@parameters('$connections')['keyvault']['connectionId']":
             path = inputs.get("path", "")
-            if "/secrets/" in path and "outputs" not in action.get("runtimeConfiguration", {}).get("secureData", {}).get("properties", []):
-                secret_name = path.split("/secrets/")[1].split("'")[1]
+            secure_props = (action.get("runtimeConfiguration") or {}).get("secureData", {}).get("properties", [])
+            if "/secrets/" in path and "outputs" not in secure_props:
+                parts = path.split("/secrets/")
+                if len(parts) > 1:
+                    quoted_parts = parts[1].split("'")
+                    secret_name = quoted_parts[1] if len(quoted_parts) > 2 else parts[1].split("/")[0]
+                else:
+                    secret_name = ""
                 secret_actions.append({
                     "ActionName": action_name,
                     "SecretName": secret_name
@@ -204,10 +210,17 @@ def main(args):
                 if args.loglevel in ["info", "verbose"]:
                     print(f"Scanning run_id: {run_id}")
                 
-                actions_url = f"https://management.azure.com/subscriptions/{quote(subscription_id)}/resourceGroups/{quote(resource_group_name)}/providers/Microsoft.Logic/workflows/{quote(logic_app_name)}/runs/{quote(run_id)}/actions?api-version=2016-06-01"
-                actions_response = requests.get(actions_url, headers={"Authorization": f"Bearer {access_token}"})
-                actions_response.raise_for_status()
-                actions = actions_response.json()["value"]
+                try:
+                    actions_url = f"https://management.azure.com/subscriptions/{quote(subscription_id)}/resourceGroups/{quote(resource_group_name)}/providers/Microsoft.Logic/workflows/{quote(logic_app_name)}/runs/{quote(run_id)}/actions?api-version=2016-06-01"
+                    actions_response = requests.get(actions_url, headers={"Authorization": f"Bearer {access_token}"})
+                    actions_response.raise_for_status()
+                    actions = actions_response.json()["value"]
+                except requests.exceptions.HTTPError as http_err:
+                    print(f"HTTP error occurred while getting actions for run {run_id}: {http_err}")
+                    continue
+                except Exception as err:
+                    print(f"An error occurred while getting actions for run {run_id}: {err}")
+                    continue
                 
                 for action in actions:
                     action_name = action["name"]
